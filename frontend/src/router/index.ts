@@ -74,6 +74,12 @@ const routes = [
     component: () => import('@/pages/Favorites.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/browsing-history',
+    name: 'BrowsingHistory',
+    component: () => import('@/pages/BrowsingHistory.vue'),
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({

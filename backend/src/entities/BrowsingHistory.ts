@@ -1,6 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index, Unique, ManyToOne } from 'typeorm';
+import { Book } from './Book';
 
 @Entity('browsing_history')
+@Unique(['userId', 'bookId'])
 export class BrowsingHistory {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -8,6 +10,9 @@ export class BrowsingHistory {
   @Column()
   @Index('idx_browse_user')
   userId: string;
+
+  @ManyToOne(() => Book)
+  book: Book;
 
   @Column()
   bookId: string;

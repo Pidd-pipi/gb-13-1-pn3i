@@ -3,7 +3,6 @@ import { AppDataSource } from '../config/database';
 import { Favorite } from '../entities/Favorite';
 import { Book } from '../entities/Book';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
-
 export const toggleFavorite = async (req: AuthenticatedRequest, res: Response) => {
   const { bookId } = req.body;
 
@@ -56,18 +55,4 @@ export const getFavorites = async (req: AuthenticatedRequest, res: Response) => 
   });
 
   res.json(favorites.map(f => f.book));
-};
-
-export const getBrowsingHistory = async (req: AuthenticatedRequest, res: Response) => {
-  const historyRepository = AppDataSource.getRepository('BrowsingHistory');
-  const histories = await historyRepository
-    .createQueryBuilder('history')
-    .innerJoinAndMapOne('history.book', 'Book', 'book', 'history.bookId = book.id')
-    .innerJoinAndMapOne('book.seller', 'User', 'seller', 'book.sellerId = seller.id')
-    .where('history.userId = :userId', { userId: req.userId })
-    .orderBy('history.viewedAt', 'DESC')
-    .take(50)
-    .getMany();
-
-  res.json(histories);
 };

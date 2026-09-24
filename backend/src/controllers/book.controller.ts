@@ -3,8 +3,7 @@ import { In, ILike, FindOperator, Between, LessThanOrEqual, MoreThanOrEqual } fr
 import { AppDataSource } from '../config/database';
 import { Book, BookStatus, SubjectCategory, BookCondition } from '../entities/Book';
 import { User } from '../entities/User';
-import { Favorite } from '../entities/Favorite';
-import { BrowsingHistory } from '../entities/BrowsingHistory';
+import { recordBrowsingHistory } from './browsingHistory.controller';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { minioService } from '../services/minio.service';
 
@@ -152,12 +151,7 @@ export const getBookById = async (req: Request, res: Response) => {
   }
 
   if (userId && userId !== book.sellerId) {
-    const historyRepository = AppDataSource.getRepository(BrowsingHistory);
-    const history = historyRepository.create({
-      userId,
-      bookId: book.id,
-    });
-    await historyRepository.save(history);
+    await recordBrowsingHistory(userId, book.id);
   }
 
   res.json(book);
