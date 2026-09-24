@@ -36,6 +36,13 @@ export interface Book {
   updatedAt: string;
 }
 
+export interface BrowsingHistoryItem {
+  id: string;
+  bookId: string;
+  viewedAt: string;
+  book: Book;
+}
+
 export interface Message {
   id: string;
   senderId: string;

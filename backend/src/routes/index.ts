@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { authMiddleware } from '../middlewares/auth.middleware';
+import { authMiddleware, optionalAuthMiddleware } from '../middlewares/auth.middleware';
 import { sendVerificationCode, register, login, authValidators } from '../controllers/auth.controller';
 import { getCurrentUser, updateProfile, uploadAvatar, getUserReviews } from '../controllers/user.controller';
 import {
@@ -12,7 +12,8 @@ import {
   getMyBooks,
   getRecommendBooks,
 } from '../controllers/book.controller';
-import { toggleFavorite, getFavorites, getBrowsingHistory } from '../controllers/favorite.controller';
+import { toggleFavorite, getFavorites } from '../controllers/favorite.controller';
+import { getBrowsingHistory, removeBrowsingHistory, clearBrowsingHistory } from '../controllers/history.controller';
 import {
   createPurchaseRequest,
   getPurchaseRequests,
@@ -35,7 +36,7 @@ router.post('/user/avatar', authMiddleware, upload.single('avatar'), uploadAvata
 router.get('/user/reviews', authMiddleware, getUserReviews);
 
 router.get('/books', getBooks);
-router.get('/books/:id', getBookById);
+router.get('/books/:id', optionalAuthMiddleware, getBookById);
 router.post('/books', authMiddleware, upload.array('images', 5), createBook);
 router.put('/books/:id/status', authMiddleware, updateBookStatus);
 router.delete('/books/:id', authMiddleware, deleteBook);
@@ -45,6 +46,8 @@ router.get('/recommend/books', authMiddleware, getRecommendBooks);
 router.post('/favorites/toggle', authMiddleware, toggleFavorite);
 router.get('/favorites', authMiddleware, getFavorites);
 router.get('/browsing-history', authMiddleware, getBrowsingHistory);
+router.delete('/browsing-history/:bookId', authMiddleware, removeBrowsingHistory);
+router.delete('/browsing-history', authMiddleware, clearBrowsingHistory);
 
 router.get('/purchase-requests', getPurchaseRequests);
 router.post('/purchase-requests', authMiddleware, createPurchaseRequest);

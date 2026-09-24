@@ -23,3 +23,20 @@ export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: N
     return res.status(401).json({ message: '无效的token' });
   }
 };
+
+// 可选认证：携带有效 token 时解析出 userId，未携带或已失效则按游客放行
+export const optionalAuthMiddleware = (req: AuthenticatedRequest, _res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = jwt.verify(token, config.jwt.secret) as { userId: string };
+      req.userId = decoded.userId;
+    } catch {
+      // token 无效时按游客处理，不阻断请求
+    }
+  }
+
+  next();
+};

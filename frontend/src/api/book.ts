@@ -1,5 +1,5 @@
 import request from './request';
-import type { Book, BookCondition, BookStatus, SubjectCategory, TradeMethod } from '@/types';
+import type { Book, BookCondition, BookStatus, BrowsingHistoryItem, SubjectCategory, TradeMethod } from '@/types';
 
 export interface BookListParams {
   keyword?: string;
@@ -79,4 +79,16 @@ export const toggleFavorite = (bookId: string) => {
 
 export const getFavorites = () => {
   return request.get<Book[]>('/favorites');
+};
+
+export const getBrowsingHistory = () => {
+  return request.get<BrowsingHistoryItem[]>('/browsing-history');
+};
+
+export const removeBrowsingHistory = (bookId: string) => {
+  return request.delete(`/browsing-history/${bookId}`);
+};
+
+export const clearBrowsingHistory = () => {
+  return request.delete('/browsing-history');
 };

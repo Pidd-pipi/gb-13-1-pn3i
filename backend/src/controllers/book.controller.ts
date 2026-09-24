@@ -152,12 +152,28 @@ export const getBookById = async (req: Request, res: Response) => {
   }
 
   if (userId && userId !== book.sellerId) {
-    const historyRepository = AppDataSource.getRepository(BrowsingHistory);
-    const history = historyRepository.create({
-      userId,
-      bookId: book.id,
-    });
-    await historyRepository.save(history);
+    try {
+      const historyRepository = AppDataSource.getRepository(BrowsingHistory);
+      // 同一本书只保留一条足迹，重复浏览时先删后插，使其排到最前
+      await historyRepository.delete({ userId, bookId: book.id });
+      const history = historyRepository.create({
+        userId,
+        bookId: book.id,
+      });
+      await historyRepository.save(history);
+
+      // 每个用户最多保留 50 条足迹，超出部分从最旧的开始删除
+      const histories = await historyRepository.find({
+        where: { userId },
+        order: { viewedAt: 'DESC' },
+        select: ['id'],
+      });
+      if (histories.length > 50) {
+        await historyRepository.delete(histories.slice(50).map(h => h.id));
+      }
+    } catch (error) {
+      console.error('记录浏览历史失败:', error);
+    }
   }
 
   res.json(book);
